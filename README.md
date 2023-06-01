@@ -5,6 +5,7 @@ What this script does:
 - retrieve sfdx project to the folder
 - gets all **Custom** **Fields**, **Standard** **Fields** and **Standard** **Value** **Sets** (Picklists)
 - **full** **global** **picklist** value set support, standard picklists duplicates covered
+- **standard** **lookups** support
 - parse them to excel and create data model for each object in separate sheet
 - creates 'All' sheet with whole data model in one sheet
 - **sheets** and **rows** sorted **alphabetically** (but not by ASCII values, true alphabetically)
