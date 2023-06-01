@@ -153,6 +153,10 @@ package_xml_content = '''<?xml version="1.0" encoding="UTF-8"?>
         <members>Pricebook2</members>
         <name>CustomObject</name>
     </types>
+    <types>
+        <members>*</members>
+        <name>GlobalValueSet</name>
+    </types>
     <version>55.0</version>
 </Package>
 '''
@@ -255,6 +259,25 @@ def extract_field_info(file_path):
         if value_set_def_elem is not None:
             value_elems = value_set_def_elem.findall('{http://soap.sforce.com/2006/04/metadata}value')
             value_set_values = '\n'.join(['' + value.find('{http://soap.sforce.com/2006/04/metadata}fullName').text for value in value_elems])
+        else:
+            value_set_name = root.find(".//{http://soap.sforce.com/2006/04/metadata}valueSet/{http://soap.sforce.com/2006/04/metadata}valueSetName")
+            value = root.find(".//{http://soap.sforce.com/2006/04/metadata}valueSet/{http://soap.sforce.com/2006/04/metadata}value")
+
+            if value_set_name is not None:
+                value = value_set_name.text
+
+            if value is not None:
+                file_name = value + '.globalValueSet-meta.xml'
+                file_path = os.path.join(project_directory, 'force-app/main/default/globalValueSets')
+                file_path = os.path.join(file_path, file_name)
+
+                if os.path.exists(file_path):
+                    tree = ET.parse(file_path)
+                    root = tree.getroot()
+
+                    full_names = [custom_value.find('{http://soap.sforce.com/2006/04/metadata}fullName').text for custom_value in root.findall(".//{http://soap.sforce.com/2006/04/metadata}customValue")]
+
+                    value_set_values = 'Global Value Set [' + value + ' ]' + '\n' +  '\n'.join(full_names)
 
     if field_type == 'Lookup':
         reference_to_elem = root.find('{http://soap.sforce.com/2006/04/metadata}referenceTo')
@@ -297,7 +320,6 @@ def create_excel_table(objects):
         object_dir = os.path.join(root_dir, 'objects')
         object_dir = os.path.join(object_dir, object_name)
         fields_dir = os.path.join(object_dir, "fields")
-        print(fields_dir)
         if not os.path.exists(fields_dir):
             print(f"Fields directory not found for object: {object_name}")
             continue
@@ -319,6 +341,8 @@ def create_excel_table(objects):
             field_name = os.path.splitext(field_file)[0]
             field_path = os.path.join(fields_dir, field_file)
             api_name, label, length, field_type, unique, precision, scale, required, externalId, value_set_values, value_set_restricted = extract_field_info(field_path)
+            if field_type == 'Picklist' and len(value_set_values) == 0: #standard picklist skip
+                continue
             sheet.append([object_name, '', api_name, label, length, field_type, unique, precision, scale, required, externalId, value_set_values, value_set_restricted, ''])
 
             row_count += 1
