@@ -3,7 +3,7 @@
 What this script does:
 
 - retrieve sfdx project to the folder
-- gets all Custom Fields, most Standard Objects, and Standard Value Sets
+- gets all Custom Fields, Standard Fields and Standard Value Sets
 - parse them to excel and create data model for each object in separate sheet
 - creates 'All' sheet with whole data model in one sheet
 
