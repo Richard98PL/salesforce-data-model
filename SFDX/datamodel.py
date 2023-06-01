@@ -316,9 +316,9 @@ def extract_field_info(file_path):
                     ]
 
                     value_set_values = (
-                        "Global Value Set ["
+                        "Global Value Set\n["
                         + value
-                        + " ]"
+                        + "]\n"
                         + "\n"
                         + "\n".join(full_names)
                     )
