@@ -27,17 +27,20 @@ data = {
     "client_id": client_id,
     "client_secret": client_secret,
     "username": username,
-    "password": password + security_token
+    "password": password + security_token,
 }
 
 # Send the HTTP POST request
 response = requests.post(auth_url, data=data)
 
 # Get the access token from the response
-access_token, instance_url = response.json()["access_token"], response.json()['instance_url']
+access_token, instance_url = (
+    response.json()["access_token"],
+    response.json()["instance_url"],
+)
 os.environ["SFDX_ACCESS_TOKEN"] = access_token
 
-package_xml_content = '''<?xml version="1.0" encoding="UTF-8"?>
+package_xml_content = """<?xml version="1.0" encoding="UTF-8"?>
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
     <types>
         <members>SolutionStatus</members>
@@ -159,12 +162,12 @@ package_xml_content = '''<?xml version="1.0" encoding="UTF-8"?>
     </types>
     <version>55.0</version>
 </Package>
-'''
+"""
 
 os.makedirs(project_directory, exist_ok=True)
 
 # Create sfdx-project.json file
-sfdx_project_content = '''{
+sfdx_project_content = """{
   "packageDirectories": [
     {
       "path": "force-app",
@@ -174,7 +177,7 @@ sfdx_project_content = '''{
   "namespace": "",
   "sfdcLoginUrl": "https://login.salesforce.com",
   "sourceApiVersion": "55.0"
-}'''
+}"""
 
 sfdx_project_file = os.path.join(project_directory, "sfdx-project.json")
 
@@ -193,16 +196,17 @@ if not os.path.isfile(package_xml_file):
 
 os.chdir(project_directory)
 
-login_cmd = f"sfdx org login access-token --no-prompt -r {instance_url} -a temporary_org"
+login_cmd = (
+    f"sfdx org login access-token --no-prompt -r {instance_url} -a temporary_org"
+)
 subprocess.run(login_cmd, shell=True)
 
-retrieve_cmd = f"sfdx project retrieve start -c -o temporary_org --manifest force-app/package.xml"
+retrieve_cmd = (
+    f"sfdx project retrieve start -c -o temporary_org --manifest force-app/package.xml"
+)
 subprocess.run(retrieve_cmd, shell=True)
-os.chdir('..')
-os.chdir('..')
-
-
-
+os.chdir("..")
+os.chdir("..")
 
 
 objectByStandardValueSet = {}
@@ -211,80 +215,133 @@ for key, values in standardValueSets.items():
         objectByStandardValueSet[value] = key
 
 
-gray_fill = PatternFill(fill_type='solid', start_color='F2F2F2', end_color='F2F2F2')
-yellow_fill = PatternFill(fill_type='solid', start_color='FFFF00', end_color='FFFF00')
-thin_border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
+gray_fill = PatternFill(fill_type="solid", start_color="F2F2F2", end_color="F2F2F2")
+yellow_fill = PatternFill(fill_type="solid", start_color="FFFF00", end_color="FFFF00")
+thin_border = Border(
+    left=Side(style="thin"),
+    right=Side(style="thin"),
+    top=Side(style="thin"),
+    bottom=Side(style="thin"),
+)
+
 
 def extract_field_info(file_path):
     tree = ET.parse(file_path)
     root = tree.getroot()
 
-    api_name_elem = root.find('{http://soap.sforce.com/2006/04/metadata}fullName')
+    api_name_elem = root.find("{http://soap.sforce.com/2006/04/metadata}fullName")
     api_name = api_name_elem.text if api_name_elem is not None else ""
 
-    label_elem = root.find('{http://soap.sforce.com/2006/04/metadata}label')
+    label_elem = root.find("{http://soap.sforce.com/2006/04/metadata}label")
     label = label_elem.text if label_elem is not None else ""
 
-    length_elem = root.find('{http://soap.sforce.com/2006/04/metadata}length')
+    length_elem = root.find("{http://soap.sforce.com/2006/04/metadata}length")
     length = length_elem.text if length_elem is not None else ""
 
-    field_type_elem = root.find('{http://soap.sforce.com/2006/04/metadata}type')
+    field_type_elem = root.find("{http://soap.sforce.com/2006/04/metadata}type")
     field_type = field_type_elem.text if field_type_elem is not None else ""
 
-    unique_elem = root.find('{http://soap.sforce.com/2006/04/metadata}unique')
+    unique_elem = root.find("{http://soap.sforce.com/2006/04/metadata}unique")
     unique = unique_elem.text if unique_elem is not None else ""
 
-    precision_elem = root.find('{http://soap.sforce.com/2006/04/metadata}precision')
+    precision_elem = root.find("{http://soap.sforce.com/2006/04/metadata}precision")
     precision = precision_elem.text if precision_elem is not None else ""
 
-    scale_elem = root.find('{http://soap.sforce.com/2006/04/metadata}scale')
+    scale_elem = root.find("{http://soap.sforce.com/2006/04/metadata}scale")
     scale = scale_elem.text if scale_elem is not None else ""
 
-    required_elem = root.find('{http://soap.sforce.com/2006/04/metadata}required')
+    required_elem = root.find("{http://soap.sforce.com/2006/04/metadata}required")
     required = required_elem.text if required_elem is not None else ""
 
-    externalId_elem = root.find('{http://soap.sforce.com/2006/04/metadata}externalId')
+    externalId_elem = root.find("{http://soap.sforce.com/2006/04/metadata}externalId")
     externalId = externalId_elem.text if externalId_elem is not None else ""
 
-    value_set_elem = root.find('{http://soap.sforce.com/2006/04/metadata}valueSet')
+    value_set_elem = root.find("{http://soap.sforce.com/2006/04/metadata}valueSet")
     value_set_restricted = "false"
     value_set_values = ""
 
     if value_set_elem is not None:
-        restricted_elem = value_set_elem.find('{http://soap.sforce.com/2006/04/metadata}restricted')
+        restricted_elem = value_set_elem.find(
+            "{http://soap.sforce.com/2006/04/metadata}restricted"
+        )
         if restricted_elem is not None:
             value_set_restricted = restricted_elem.text
 
-        value_set_def_elem = value_set_elem.find('{http://soap.sforce.com/2006/04/metadata}valueSetDefinition')
+        value_set_def_elem = value_set_elem.find(
+            "{http://soap.sforce.com/2006/04/metadata}valueSetDefinition"
+        )
         if value_set_def_elem is not None:
-            value_elems = value_set_def_elem.findall('{http://soap.sforce.com/2006/04/metadata}value')
-            value_set_values = '\n'.join(['' + value.find('{http://soap.sforce.com/2006/04/metadata}fullName').text for value in value_elems])
+            value_elems = value_set_def_elem.findall(
+                "{http://soap.sforce.com/2006/04/metadata}value"
+            )
+            value_set_values = "\n".join(
+                [
+                    ""
+                    + value.find(
+                        "{http://soap.sforce.com/2006/04/metadata}fullName"
+                    ).text
+                    for value in value_elems
+                ]
+            )
         else:
-            value_set_name = root.find(".//{http://soap.sforce.com/2006/04/metadata}valueSet/{http://soap.sforce.com/2006/04/metadata}valueSetName")
-            value = root.find(".//{http://soap.sforce.com/2006/04/metadata}valueSet/{http://soap.sforce.com/2006/04/metadata}value")
+            value_set_name = root.find(
+                ".//{http://soap.sforce.com/2006/04/metadata}valueSet/{http://soap.sforce.com/2006/04/metadata}valueSetName"
+            )
+            value = root.find(
+                ".//{http://soap.sforce.com/2006/04/metadata}valueSet/{http://soap.sforce.com/2006/04/metadata}value"
+            )
 
             if value_set_name is not None:
                 value = value_set_name.text
 
             if value is not None:
-                file_name = value + '.globalValueSet-meta.xml'
-                file_path = os.path.join(project_directory, 'force-app/main/default/globalValueSets')
+                file_name = value + ".globalValueSet-meta.xml"
+                file_path = os.path.join(
+                    project_directory, "force-app/main/default/globalValueSets"
+                )
                 file_path = os.path.join(file_path, file_name)
 
                 if os.path.exists(file_path):
                     tree = ET.parse(file_path)
                     root = tree.getroot()
 
-                    full_names = [custom_value.find('{http://soap.sforce.com/2006/04/metadata}fullName').text for custom_value in root.findall(".//{http://soap.sforce.com/2006/04/metadata}customValue")]
+                    full_names = [
+                        custom_value.find(
+                            "{http://soap.sforce.com/2006/04/metadata}fullName"
+                        ).text
+                        for custom_value in root.findall(
+                            ".//{http://soap.sforce.com/2006/04/metadata}customValue"
+                        )
+                    ]
 
-                    value_set_values = 'Global Value Set [' + value + ' ]' + '\n' +  '\n'.join(full_names)
+                    value_set_values = (
+                        "Global Value Set ["
+                        + value
+                        + " ]"
+                        + "\n"
+                        + "\n".join(full_names)
+                    )
 
-    if field_type == 'Lookup':
-        reference_to_elem = root.find('{http://soap.sforce.com/2006/04/metadata}referenceTo')
+    if field_type == "Lookup":
+        reference_to_elem = root.find(
+            "{http://soap.sforce.com/2006/04/metadata}referenceTo"
+        )
         reference_to = reference_to_elem.text if reference_to_elem is not None else ""
         field_type = f"{field_type} ({reference_to})"
 
-    return api_name, label, length, field_type, unique, precision, scale, required, externalId, value_set_values, value_set_restricted
+    return (
+        api_name,
+        label,
+        length,
+        field_type,
+        unique,
+        precision,
+        scale,
+        required,
+        externalId,
+        value_set_values,
+        value_set_restricted,
+    )
 
 
 def get_fullnames_from_xml(file_path):
@@ -293,14 +350,14 @@ def get_fullnames_from_xml(file_path):
 
     # Extract the full names of the standard values
     full_names = []
-    namespace = {'ns': 'http://soap.sforce.com/2006/04/metadata'}
-    result = ''
-    for standard_value in root.findall('ns:standardValue', namespace):
-        full_name = standard_value.find('ns:fullName', namespace).text
+    namespace = {"ns": "http://soap.sforce.com/2006/04/metadata"}
+    result = ""
+    for standard_value in root.findall("ns:standardValue", namespace):
+        full_name = standard_value.find("ns:fullName", namespace).text
         full_names.append(full_name)
 
     for name in full_names:
-        result += '\n' + name
+        result += "\n" + name
 
     return result
 
@@ -312,12 +369,27 @@ def create_excel_table(objects):
     default_sheet = wb.active
     wb.remove(default_sheet)
 
-    columns = ['Object', 'Comment', 'API Name', 'Label', 'Length', 'Type', 'Unique', 'Precision', 'Scale', 'Required', 'External Id', 'Value Set', 'Value Set Restricted', 'User Story']
+    columns = [
+        "Object",
+        "Comment",
+        "API Name",
+        "Label",
+        "Length",
+        "Type",
+        "Unique",
+        "Precision",
+        "Scale",
+        "Required",
+        "External Id",
+        "Value Set",
+        "Value Set Restricted",
+        "User Story",
+    ]
     all_sheet = wb.create_sheet(title="All")
     all_sheet.append(columns)
 
     for object_name in objects:
-        object_dir = os.path.join(root_dir, 'objects')
+        object_dir = os.path.join(root_dir, "objects")
         object_dir = os.path.join(object_dir, object_name)
         fields_dir = os.path.join(object_dir, "fields")
         if not os.path.exists(fields_dir):
@@ -327,38 +399,65 @@ def create_excel_table(objects):
         title = object_name[:30]
         sheet = wb.create_sheet(title=title)
         sheet.append(columns)
-        sheet.freeze_panes = 'B2'  # Freeze the first row
-
-
-
-
+        sheet.freeze_panes = "B2"  # Freeze the first row
 
         row_count = 0
         for field_file in os.listdir(fields_dir):
-            if field_file.startswith('.'):
+            if field_file.startswith("."):
                 continue
 
             field_name = os.path.splitext(field_file)[0]
             field_path = os.path.join(fields_dir, field_file)
-            api_name, label, length, field_type, unique, precision, scale, required, externalId, value_set_values, value_set_restricted = extract_field_info(field_path)
-            if field_type == 'Picklist' and len(value_set_values) == 0: #standard picklist skip
+            (
+                api_name,
+                label,
+                length,
+                field_type,
+                unique,
+                precision,
+                scale,
+                required,
+                externalId,
+                value_set_values,
+                value_set_restricted,
+            ) = extract_field_info(field_path)
+            if (
+                field_type == "Picklist" and len(value_set_values) == 0
+            ):  # standard picklist skip
                 continue
-            sheet.append([object_name, '', api_name, label, length, field_type, unique, precision, scale, required, externalId, value_set_values, value_set_restricted, ''])
+            sheet.append(
+                [
+                    object_name,
+                    "",
+                    api_name,
+                    label,
+                    length,
+                    field_type,
+                    unique,
+                    precision,
+                    scale,
+                    required,
+                    externalId,
+                    value_set_values,
+                    value_set_restricted,
+                    "",
+                ]
+            )
 
             row_count += 1
             for cell in sheet[row_count]:
                 cell.border = thin_border
-            
+
             if row_count % 2 == 1:
                 for row in sheet.iter_rows(min_row=row_count, max_row=row_count):
                     for cell in row:
                         cell.fill = gray_fill
-            
+
             for row in sheet.iter_rows(min_row=0, max_row=1):
                 for cell in row:
                     cell.fill = yellow_fill
-        
-        last_row = len(sheet['A'])
+
+        last_row = len(sheet["A"])
         for row in sheet.iter_rows(min_row=last_row, max_row=last_row):
             for cell in row:
                 cell.border = thin_border
@@ -368,8 +467,6 @@ def create_excel_table(objects):
                 for cell in row:
                     cell.fill = gray_fill
 
-                
-
         for column in sheet.columns:
             max_length = 0
             column_letter = column[0].column_letter
@@ -378,8 +475,13 @@ def create_excel_table(objects):
                     if len(str(cell.value)) > max_length:
                         max_length = len(cell.value)
                         # Adjust max_length for the "Value Set" column based on the longest substring
-                        if '\n' in str(cell.value):
-                            max_length = max([len(substring) for substring in str(cell.value).split('\n')])
+                        if "\n" in str(cell.value):
+                            max_length = max(
+                                [
+                                    len(substring)
+                                    for substring in str(cell.value).split("\n")
+                                ]
+                            )
                 except TypeError:
                     pass
             adjusted_width = (max_length + 2) * 1.2
@@ -391,20 +493,16 @@ def create_excel_table(objects):
             for cell in value_set_column:
                 cell.alignment = Alignment(wrapText=True)
 
-
-
-
-
         standard_value_sets_dir = os.path.join(root_dir, "standardValueSets")
         if os.path.exists(standard_value_sets_dir):
             for file_name in os.listdir(standard_value_sets_dir):
                 if file_name.endswith(".standardValueSet-meta.xml"):
                     file_path = os.path.join(standard_value_sets_dir, file_name)
                     word = file_name.split(".")[0]
-                    
+
                     if word not in objectByStandardValueSet:
                         continue
-                    
+
                     object = objectByStandardValueSet[word]
 
                     if object not in object_list:
@@ -412,14 +510,14 @@ def create_excel_table(objects):
 
                     if object_name != object:
                         continue
-                    
+
                     # Create a row in the appropriate sheet based on object name
                     standard_sheet_name = object[:30]
 
                     if standard_sheet_name not in wb.sheetnames:
                         standard_sheet = wb.create_sheet(title=standard_sheet_name)
                         standard_sheet.append(columns)
-                        standard_sheet.freeze_panes = 'B2'  # Freeze the first row
+                        standard_sheet.freeze_panes = "B2"  # Freeze the first row
                     else:
                         standard_sheet = wb[standard_sheet_name]
 
@@ -427,15 +525,32 @@ def create_excel_table(objects):
                     fullNames = get_fullnames_from_xml(file_path)
 
                     # Create the row with the extracted information
-                    row = [object, '', word, word, '', 'Standard Picklist', '', '', '', '', '', fullNames, 'false', '']
+                    row = [
+                        object,
+                        "",
+                        word,
+                        word,
+                        "",
+                        "Standard Picklist",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        fullNames,
+                        "false",
+                        "",
+                    ]
                     standard_sheet.append(row)
 
                     # Apply formatting to the row
-                    row_count = len(standard_sheet['A'])
+                    row_count = len(standard_sheet["A"])
                     for cell in standard_sheet[row_count]:
                         cell.border = thin_border
                     if row_count % 2 == 1:
-                        for row in standard_sheet.iter_rows(min_row=row_count, max_row=row_count):
+                        for row in standard_sheet.iter_rows(
+                            min_row=row_count, max_row=row_count
+                        ):
                             for cell in row:
                                 cell.fill = gray_fill
 
@@ -452,38 +567,44 @@ def create_excel_table(objects):
                                 if len(str(cell.value)) > max_length:
                                     max_length = len(cell.value)
                                     # Adjust max_length for the "Value Set" column based on the longest substring
-                                    if '\n' in str(cell.value):
-                                        max_length = max([len(substring) for substring in str(cell.value).split('\n')])
+                                    if "\n" in str(cell.value):
+                                        max_length = max(
+                                            [
+                                                len(substring)
+                                                for substring in str(cell.value).split(
+                                                    "\n"
+                                                )
+                                            ]
+                                        )
                             except TypeError:
                                 pass
                         adjusted_width = (max_length + 2) * 1.2
-                        standard_sheet.column_dimensions[column_letter].width = adjusted_width
+                        standard_sheet.column_dimensions[
+                            column_letter
+                        ].width = adjusted_width
 
                         for value_set_column in standard_sheet:
                             for cell in value_set_column:
                                 cell.alignment = Alignment(wrapText=True)
-        
-
 
         # Merge sheets into "All" sheet
         row_count = 0
         for row in sheet.iter_rows(min_row=2):
             all_sheet.append([cell.value for cell in row])
 
+    # styles for All sheet
 
-    #styles for All sheet
-    
     for row in all_sheet.iter_rows(min_row=0, max_row=1):
         for cell in row:
             cell.fill = yellow_fill
     last_row = 0
-    for row in all_sheet.iter_rows(min_row=0, max_row=len(all_sheet['A'])):
+    for row in all_sheet.iter_rows(min_row=0, max_row=len(all_sheet["A"])):
         last_row += 1
         for cell in row:
             cell.border = thin_border
             if last_row % 2 == 1 and last_row != 1:
                 cell.fill = gray_fill
-       
+
     # Adjust column widths in the "All" sheet
     for column in all_sheet.columns:
         max_length = 0
@@ -494,8 +615,13 @@ def create_excel_table(objects):
                 if len(str(cell.value)) > max_length:
                     max_length = len(cell.value)
                     # Adjust max_length for the "Value Set" column based on the longest substring
-                    if '\n' in str(cell.value):
-                        max_length = max([len(substring) for substring in str(cell.value).split('\n')])
+                    if "\n" in str(cell.value):
+                        max_length = max(
+                            [
+                                len(substring)
+                                for substring in str(cell.value).split("\n")
+                            ]
+                        )
                         wasNewLine = True
             except TypeError:
                 pass
@@ -515,13 +641,12 @@ def create_excel_table(objects):
     # Freeze the first row and set it to bold in all sheets
     for sheet_name in wb.sheetnames:
         sheet = wb[sheet_name]
-        sheet.freeze_panes = 'B2'
+        sheet.freeze_panes = "B2"
         for cell in sheet[1]:
             cell.font = Font(bold=True)
 
     wb.save(excel_file)
     print(f"Excel file '{excel_file}' created successfully.")
-
 
 
 create_excel_table(object_list)
