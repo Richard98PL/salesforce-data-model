@@ -315,13 +315,9 @@ def extract_field_info(file_path):
                         )
                     ]
 
-                    value_set_values = (
-                        "Global Value Set\n["
-                        + value
-                        + "]\n"
-                        + "\n"
-                        + "\n".join(full_names)
-                    )
+                    value_set_values = "\n".join(full_names)
+                    field_type += ' - Global Value Set [' + value + ']'
+                        
 
     if field_type == "Lookup":
         reference_to_elem = root.find(
@@ -330,6 +326,9 @@ def extract_field_info(file_path):
         reference_to = reference_to_elem.text if reference_to_elem is not None else ""
         field_type = f"{field_type} ({reference_to})"
 
+    if api_name.endswith('Id') and field_type == 'Lookup ()':
+        field_type = 'Lookup (' + api_name[:-2] + ')'
+    
     return (
         api_name,
         label,
