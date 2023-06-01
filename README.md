@@ -7,7 +7,7 @@ What this script does:
 - **full** **global** **picklist** value set support, standard picklists duplicates covered
 - parse them to excel and create data model for each object in separate sheet
 - creates 'All' sheet with whole data model in one sheet
-- **sheets** and **rows** sorted **alphabetically**
+- **sheets** and **rows** sorted **alphabetically** (but not by ASCII values, true alphabetically)
 
 What can be configured (config.js):
 - org authorization (username, password, security_token, client_id, client_secret)
