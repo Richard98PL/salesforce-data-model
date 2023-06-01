@@ -18,6 +18,9 @@ You can filter the excel.
 Example: check all datetime fields in the system for selected objects.
 
 <img width="1436" alt="image" src="https://github.com/Richard98PL/salesforce-data-model/assets/41301282/36760a23-2132-4c80-bef1-d84ce8431aea">
+
 ![image](https://github.com/Richard98PL/salesforce-data-model/assets/41301282/b49d8eab-4131-4c42-8d22-0a419db97a61)
+
 ![image](https://github.com/Richard98PL/salesforce-data-model/assets/41301282/734d5a3b-50fe-44fa-b84e-58b59f9f53c6)
+
 <img width="1383" alt="image" src="https://github.com/Richard98PL/salesforce-data-model/assets/41301282/2bf9392e-93d7-4746-9935-4d192da81170">
