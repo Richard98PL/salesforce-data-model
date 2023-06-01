@@ -653,6 +653,7 @@ def create_excel_table(objects):
 create_excel_table(object_list)
 
 
+
 import openpyxl
 from openpyxl.styles import PatternFill
 import pandas as pd
@@ -682,13 +683,19 @@ for sheet_name in workbook.sheetnames:
     df = df[1:]
     df.columns = header
 
-    # Sort the DataFrame by the 'API Name' column
-    df.sort_values('API Name', inplace=True)
+    # Create a new column with lowercase 'API Name' values for sorting
+    df['API Name Lower'] = df['API Name'].str.lower()
+
+    # Sort the DataFrame by the lowercase 'API Name' column
+    df.sort_values('API Name Lower', inplace=True)
 
     # Paint all rows white
     paint_rows_white(current_sheet)
 
-    # Write the sorted DataFrame to the worksheet
+    # Remove the lowercase 'API Name' column from the DataFrame
+    df.drop('API Name Lower', axis=1, inplace=True)
+
+    # Write the sorted DataFrame to the worksheet, preserving original case
     for r_idx, row in enumerate(df.values, start=2):
         for c_idx, value in enumerate(row, start=1):
             current_sheet.cell(row=r_idx, column=c_idx).value = value
@@ -700,5 +707,4 @@ for sheet_name in workbook.sheetnames:
     current_sheet.auto_filter.ref = current_sheet.dimensions
 
 # Save the modified Excel file
-workbook.save('data_model.xlsx')
-
+workbook.save('sorted_data_model.xlsx')
