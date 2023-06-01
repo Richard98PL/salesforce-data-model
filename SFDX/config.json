@@ -1,0 +1,18 @@
+{
+    "root_dir": "project/directory/force-app/main/default/",
+    "username": "...",
+    "password": "...",
+    "security_token": "...",
+    "client_id": "...",
+    "client_secret": "...",
+    "object_list": ["Account", "Lead", "Contact", "Customer_Interest_Profile_Attribute__c", "Visit_Integration_Page_Mapping__mdt"],
+    "standardValueSets": {
+      "Lead": ["LeadStatus", "LeadSource"],
+      "Account": ["AccountType", "Industry"],
+      "Task": ["TaskStatus", "TaskSubject", "TaskType", "TaskPriority"],
+      "Opportunity": ["OpportunityStage", "OpportunityType"]
+    },
+    "project_directory": "project/directory",
+    "auth_url": "https://login.salesforce.com/services/oauth2/token"
+  }
+  
