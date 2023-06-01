@@ -18,6 +18,7 @@ security_token = config["security_token"]
 client_id = config["client_id"]
 client_secret = config["client_secret"]
 object_list = config["object_list"]
+object_list = sorted(object_list)
 standardValueSets = config["standardValueSets"]
 project_directory = config["project_directory"]
 auth_url = config["auth_url"]
@@ -196,15 +197,15 @@ if not os.path.isfile(package_xml_file):
 
 os.chdir(project_directory)
 
-login_cmd = (
-    f"sfdx org login access-token --no-prompt -r {instance_url} -a temporary_org"
-)
-subprocess.run(login_cmd, shell=True)
+# login_cmd = (
+#     f"sfdx org login access-token --no-prompt -r {instance_url} -a temporary_org"
+# )
+# subprocess.run(login_cmd, shell=True)
 
-retrieve_cmd = (
-    f"sfdx project retrieve start -c -o temporary_org --manifest force-app/package.xml"
-)
-subprocess.run(retrieve_cmd, shell=True)
+# retrieve_cmd = (
+#     f"sfdx project retrieve start -c -o temporary_org --manifest force-app/package.xml"
+# )
+# subprocess.run(retrieve_cmd, shell=True)
 os.chdir("..")
 os.chdir("..")
 
