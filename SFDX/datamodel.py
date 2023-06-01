@@ -197,15 +197,15 @@ if not os.path.isfile(package_xml_file):
 
 os.chdir(project_directory)
 
-# login_cmd = (
-#     f"sfdx org login access-token --no-prompt -r {instance_url} -a temporary_org"
-# )
-# subprocess.run(login_cmd, shell=True)
+login_cmd = (
+    f"sfdx org login access-token --no-prompt -r {instance_url} -a temporary_org"
+)
+subprocess.run(login_cmd, shell=True)
 
-# retrieve_cmd = (
-#     f"sfdx project retrieve start -c -o temporary_org --manifest force-app/package.xml"
-# )
-# subprocess.run(retrieve_cmd, shell=True)
+retrieve_cmd = (
+    f"sfdx project retrieve start -c -o temporary_org --manifest force-app/package.xml"
+)
+subprocess.run(retrieve_cmd, shell=True)
 os.chdir("..")
 os.chdir("..")
 
@@ -651,3 +651,54 @@ def create_excel_table(objects):
 
 
 create_excel_table(object_list)
+
+
+import openpyxl
+from openpyxl.styles import PatternFill
+import pandas as pd
+
+def paint_rows_white(sheet):
+    for row in sheet.iter_rows(min_row=2):
+        for cell in row:
+            cell.fill = PatternFill(start_color="FFFFFF", end_color="FFFFFF", fill_type="solid")
+
+def color_alternate_rows(sheet):
+    gray_fill = PatternFill(start_color="D3D3D3", end_color="D3D3D3", fill_type="solid")
+    for row in sheet.iter_rows(min_row=3):
+        for cell in row:
+            if cell.row % 2 == 0:
+                cell.fill = gray_fill
+
+# Load the Excel file
+workbook = openpyxl.load_workbook('data_model.xlsx')
+
+# Iterate through each sheet
+for sheet_name in workbook.sheetnames:
+    current_sheet = workbook[sheet_name]
+
+    # Convert the sheet to a pandas DataFrame
+    df = pd.DataFrame(current_sheet.values)
+    header = df.iloc[0]
+    df = df[1:]
+    df.columns = header
+
+    # Sort the DataFrame by the 'API Name' column
+    df.sort_values('API Name', inplace=True)
+
+    # Paint all rows white
+    paint_rows_white(current_sheet)
+
+    # Write the sorted DataFrame to the worksheet
+    for r_idx, row in enumerate(df.values, start=2):
+        for c_idx, value in enumerate(row, start=1):
+            current_sheet.cell(row=r_idx, column=c_idx).value = value
+
+    # Color alternate rows gray
+    color_alternate_rows(current_sheet)
+
+    # Apply autofilter
+    current_sheet.auto_filter.ref = current_sheet.dimensions
+
+# Save the modified Excel file
+workbook.save('data_model.xlsx')
+
