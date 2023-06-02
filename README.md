@@ -16,6 +16,9 @@ What can be configured (config.js):
 - auth_url (auth_url)
 - which objects are interesting for you (object_list)
 
+TODO
+- type and label for standard fields that are not picklists
+
 Benefits:
 You can filter the excel.
 Example: check all datetime fields in the system for selected objects.
